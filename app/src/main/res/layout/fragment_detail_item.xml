@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/holo_green_light"
+    android:orientation="vertical"
+    tools:context=".DetailItemFragment">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imgViewDetail"
+            android:src="@drawable/iphone2"
+            android:scaleType="centerCrop"
+            android:layout_width="120dp"
+            android:layout_height="120dp"/>
+
+        <RelativeLayout
+            android:layout_marginLeft="12dp"
+            android:layout_weight="5"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/txt_id_item_detail"
+                android:text="01"
+                android:padding="8dp"
+                android:textSize="18dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <EditText
+                android:id="@+id/edt_name_item_detail"
+                android:text="Iphone 13 ProMax"
+                android:padding="8dp"
+                android:textSize="18dp"
+                android:layout_alignTop="@+id/txt_id_item_detail"
+                android:layout_toEndOf="@+id/txt_id_item_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <EditText
+                android:id="@+id/edt_price_item_detail"
+                android:text="12000000"
+                android:padding="8dp"
+                android:textSize="18dp"
+                android:layout_alignLeft="@+id/txt_id_item_detail"
+                android:layout_below="@+id/txt_id_item_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/btnFavorite"
+            android:layout_weight="1"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/baseline_favorite_24_white"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnUpdate"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Update" />
+
+</LinearLayout>
