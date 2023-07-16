@@ -1,13 +1,23 @@
-package com.example.demo_app_4_1;
+package com.example.demo_app_4_1.fragment;
 
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.Manifest;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
@@ -20,11 +30,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.demo_app_4_1.MainActivity;
+import com.example.demo_app_4_1.R;
+import com.example.demo_app_4_1.notification.MyNotification;
+import com.example.demo_app_4_1.service.NotifiService;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.normal.TedPermission;
-import com.gun0912.*;
 
+import java.util.Date;
 import java.util.List;
 
 public class DetailItemFragment extends Fragment {
@@ -38,8 +52,10 @@ public class DetailItemFragment extends Fragment {
     private String img;
     private String name;
     private int price;
-
-    private boolean favorite;
+    private boolean favorite = false;
+    private static final String TITLE_NOTIFI = "Add favorite";
+    private static final String CONTENT_NOTIFI = "The product has been added to favorites";
+    SharedPreferences.OnSharedPreferenceChangeListener listener;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,7 +63,7 @@ public class DetailItemFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_detail_item, container, false);
 
         imageView = view.findViewById(R.id.imgViewDetail);
-        imgFavorite =  view.findViewById(R.id.btnFavorite);
+        imgFavorite = view.findViewById(R.id.btnFavorite);
         txtId = view.findViewById(R.id.txt_id_item_detail);
         edtName = view.findViewById(R.id.edt_name_item_detail);
         edtPrice = view.findViewById(R.id.edt_price_item_detail);
@@ -58,13 +74,14 @@ public class DetailItemFragment extends Fragment {
         imgFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(favorite){
-                    favorite = false;
-                    imgFavorite.setImageResource(R.drawable.baseline_favorite_24);
-                }
-                else {
-                    favorite = true;
+                if (favorite) {
                     imgFavorite.setImageResource(R.drawable.baseline_favorite_24_white);
+                    favorite = !favorite;
+
+                } else {
+                    imgFavorite.setImageResource(R.drawable.baseline_favorite_24);
+                    favorite = !favorite;
+                    sendNotificationFavorite();
                 }
             }
         });
@@ -84,11 +101,11 @@ public class DetailItemFragment extends Fragment {
                 editor.putString("image", uri.toString());
                 editor.putString("name", nameUpdate);
                 editor.putInt("price", priceUpdate);
+                Toast.makeText(getContext(), "" + favorite, Toast.LENGTH_SHORT).show();
                 editor.putBoolean("favorite", favorite);
                 editor.apply();
 
-                Toast.makeText(getContext(), "Update success!!!", Toast.LENGTH_SHORT).show();
-
+                sendNotification();
             }
         });
 
@@ -102,11 +119,60 @@ public class DetailItemFragment extends Fragment {
         return view;
     }
 
+    private void sendNotificationFavorite() {
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.picture_notifi);
+        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+        Intent resultIntent = new Intent(getContext(), MainActivity.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(getContext());
+        stackBuilder.addNextIntentWithParentStack(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(getNotificationId(),
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        Notification notification = new NotificationCompat.Builder(getContext(), MyNotification.CHANNEL_ID_2)
+                .setContentTitle(TITLE_NOTIFI)
+                .setContentText(CONTENT_NOTIFI)
+//                .setStyle(new NotificationCompat.BigTextStyle().bigText(CONTENT_NOTIFI))
+                .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bitmap).bigLargeIcon(null))
+                .setSmallIcon(R.drawable.baseline_notifications_24)
+                .setLargeIcon(bitmap)
+                .setSound(uri)
+                .setAutoCancel(true)
+                .setContentIntent(resultPendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setColor(getResources().getColor(R.color.green))
+                .build();
+
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getContext());
+        if (ActivityCompat.checkSelfPermission(getContext(),
+                Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        notificationManagerCompat.notify(getNotificationId(), notification);
+
+    }
+
+    private int getNotificationId(){
+        return (int) new Date().getTime();
+    }
+
+    private void sendNotification() {
+        // binding service
+        Intent intentService = new Intent(getActivity(), NotifiService.class);
+        String id = txtId.getText().toString().trim();
+        String name = edtName.getText().toString().trim();
+        String contentNotifi = "update: " + id + ", " + name;
+        intentService.putExtra("key_content_intent", contentNotifi);
+
+        getContext().startService(intentService);
+    }
+
     private void selectImageFromGallery(){
         ImagePicker.with(this)
-                .crop()	    			//Crop image(Optional), Check Customization for more option
-                .compress(1024)			//Final image size will be less than 1 MB(Optional)
-                .maxResultSize(1080, 1080)	//Final image resolution will be less than 1080 x 1080(Optional)
+                .crop()
+                .compress(1024)
+                .maxResultSize(1080, 1080)
                 .start();
     }
 
@@ -132,13 +198,11 @@ public class DetailItemFragment extends Fragment {
     }
 
     private void callPermission(){
-
         PermissionListener permissionlistener = new PermissionListener() {
             @Override
             public void onPermissionGranted() {
                 selectImageFromGallery();
             }
-
             @Override
             public void onPermissionDenied(List<String> deniedPermissions) {
                 Toast.makeText(getContext(), "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
@@ -155,11 +219,8 @@ public class DetailItemFragment extends Fragment {
                 .check();
     }
 
-    SharedPreferences.OnSharedPreferenceChangeListener listener;
     void setData(){
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
-
-
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {

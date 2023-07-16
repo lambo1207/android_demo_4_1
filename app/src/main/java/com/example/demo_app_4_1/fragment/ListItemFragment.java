@@ -1,4 +1,4 @@
-package com.example.demo_app_4_1;
+package com.example.demo_app_4_1.fragment;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -12,13 +12,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.demo_app_4_1.adapter.ListItemAdapter;
+import com.example.demo_app_4_1.R;
 import com.example.demo_app_4_1.model.Item;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Favorite extends Fragment {
+public class ListItemFragment extends Fragment {
 
     RecyclerView rcvItem;
     List<Item> itemList = new ArrayList<>();
@@ -27,18 +29,18 @@ public class Favorite extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_favorite, container, false);
+        View view = inflater.inflate(R.layout.fragment_list_item, container, false);
 
-        rcvItem = view.findViewById(R.id.rcvFavorite);
+        rcvItem = view.findViewById(R.id.rcvListItem);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false);
         rcvItem.setLayoutManager(linearLayoutManager);
 
         listItemAdapter = new ListItemAdapter(getActivity());
-        listItemAdapter.setData(getData(itemList, getContext()));
+        itemList = getData(itemList, getContext());
+        listItemAdapter.setData(itemList);
         rcvItem.setAdapter(listItemAdapter);
         listItemAdapter.notifyDataSetChanged();
-
         return view;
     }
 
@@ -54,7 +56,7 @@ public class Favorite extends Fragment {
         String[] name = {"Iphone 11", "Iphone 12 Pro", "Iphone 13 ProMax", "Iphone 12 Mini", "Iphone 13 Mini", "Iphone 11 ProMax", "Iphone 14", "Iphone 14 Pro", "Iphone 14 ProMax", "Iphone 15"};
         int[] price = {12000000, 16000000, 15000000, 17000000, 18000000, 19000000, 20000000, 22000000, 25000000, 26000000, 30000000};
 
-        for (int i = 1; i <= 200; i++){
+        for (int i = 1; i <= 5; i++){
             itemList.add(new Item( imgString[random.nextInt(imgString.length)], i,  name[random.nextInt(name.length)], price[random.nextInt(price.length)], false));
         }
         return itemList;
@@ -64,7 +66,7 @@ public class Favorite extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        listItemAdapter.setData(getData(itemList, getContext()));
+        listItemAdapter.setData(itemList);
     }
 
     @Override

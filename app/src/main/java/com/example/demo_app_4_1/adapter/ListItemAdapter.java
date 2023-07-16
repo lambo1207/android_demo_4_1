@@ -1,11 +1,10 @@
-package com.example.demo_app_4_1;
+package com.example.demo_app_4_1.adapter;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,20 +15,22 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.demo_app_4_1.R;
 import com.example.demo_app_4_1.model.Item;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapter.ItemViewHolder> {
     private Context context ;
-    private List<Item> itemList;
+    public List<Item> itemList = new ArrayList<>();
+    public List<Item> setItemList = new ArrayList<>();
     private SharedPreferences sharedPreferences;
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
     public ListItemAdapter(Context context) {
-
         this.context = context;
         sharedPreferences = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
-
     }
 
     public class ItemViewHolder extends RecyclerView.ViewHolder {
@@ -134,7 +135,6 @@ public class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapter.ItemVi
                 int idChanged = 0;
                 idChanged = sharedPreferences.getInt("id", 0);
                 if (key.equals("id")) {
-
                     idChanged = sharedPreferences.getInt(key, 0);
                     for (Item item : itemList) {
                         if (item.getId() == idChanged) {
@@ -143,6 +143,7 @@ public class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapter.ItemVi
                         }
                     }
                 }
+
                 if (key.equals("name")) {
                     String nameChanged = sharedPreferences.getString(key, "");
                     for (Item item : itemList) {
@@ -170,8 +171,68 @@ public class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapter.ItemVi
                         }
                     }
                 }
+                if (key.equals("favorite")) {
+                    boolean favorite = sharedPreferences.getBoolean(key, false);
+                    for (Item item : itemList) {
+                        if (item.getId() == idChanged) {
+                            item.setFavorite(favorite);
+                            break;
+                        }
+                    }
+                }
             }
         };
+        sharedPreferences.registerOnSharedPreferenceChangeListener(listener);
+
+        notifyDataSetChanged();
+    }
+
+    public void fillData(List<Item> listFavor){
+        List<Item> newList = new ArrayList<>(listFavor);
+        this.itemList = newList;
+        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                boolean checkFavor = sharedPreferences.getBoolean("favorite", false);
+
+                if (key.equals("favorite")){
+                    String imageChanged = sharedPreferences.getString("image", "");
+                    int idCha = sharedPreferences.getInt("id", 0);
+                    String nameCha = sharedPreferences.getString("name", "");
+                    int priceChanged = sharedPreferences.getInt("price", 0);
+
+                    if (listFavor != null){
+                        if (checkFavor){
+                            int count = 0;
+                            for (Item item : listFavor){
+                                if (item.getId() == idCha){
+                                    count++;
+                                }
+                            }
+                            if (count == 0 ){
+                                listFavor.add(new Item(imageChanged, idCha, nameCha, priceChanged, checkFavor));
+                            }
+                        }
+                        else {
+                            Iterator<Item> iterator = listFavor.iterator();
+                            while (iterator.hasNext()) {
+                                Item item = iterator.next();
+                                if (item.getId() == idCha) {
+                                    iterator.remove();
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        if (checkFavor){
+                            listFavor.add(new Item(imageChanged, idCha, nameCha, priceChanged, checkFavor));
+                        }
+                    }
+                }
+            }
+        };
+
         sharedPreferences.registerOnSharedPreferenceChangeListener(listener);
 
         notifyDataSetChanged();
