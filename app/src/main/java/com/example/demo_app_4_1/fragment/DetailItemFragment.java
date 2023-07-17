@@ -101,7 +101,6 @@ public class DetailItemFragment extends Fragment {
                 editor.putString("image", uri.toString());
                 editor.putString("name", nameUpdate);
                 editor.putInt("price", priceUpdate);
-                Toast.makeText(getContext(), "" + favorite, Toast.LENGTH_SHORT).show();
                 editor.putBoolean("favorite", favorite);
                 editor.apply();
 

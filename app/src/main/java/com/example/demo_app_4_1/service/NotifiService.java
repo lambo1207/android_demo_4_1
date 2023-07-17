@@ -38,7 +38,7 @@ public class NotifiService extends Service {
         String contentNotifiGet = intent.getStringExtra("key_content_intent");
         sendNotification(contentNotifiGet);
 
-        return START_NOT_STICKY;
+        return START_REDELIVER_INTENT;
     }
 
     private void sendNotification(String contentNotifiGet) {

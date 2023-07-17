@@ -1,9 +1,16 @@
 package com.example.demo_app_4_1.model;
 
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "item")
 public class Item {
 
-    private String resourceImage;
+    @PrimaryKey(autoGenerate = true)
+    private int key;
     private int id;
+    private String resourceImage;
     private String name;
     private int price;
     private boolean favorite;
@@ -14,6 +21,14 @@ public class Item {
         this.name = name;
         this.price = price;
         this.favorite = favorite;
+    }
+
+    public int getKey() {
+        return key;
+    }
+
+    public void setKey(int key) {
+        this.key = key;
     }
 
     public String getResourceImage() {

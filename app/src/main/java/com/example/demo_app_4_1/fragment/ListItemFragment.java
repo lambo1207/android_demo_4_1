@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import com.example.demo_app_4_1.adapter.ListItemAdapter;
 import com.example.demo_app_4_1.R;
+import com.example.demo_app_4_1.database.UserDatabase;
 import com.example.demo_app_4_1.model.Item;
 
 import java.util.ArrayList;
@@ -45,6 +46,8 @@ public class ListItemFragment extends Fragment {
     }
 
     public List<Item> getData(List<Item> itemList, Context context) {
+
+
         Random random = new Random();
         int[] imgInt = {R.drawable.ipad1, R.drawable.ipad2, R.drawable.iphone2, R.drawable.iphone22, R.drawable.iphone23, R.drawable.iphone24, R.drawable.iphone30, R.drawable.iphone31};
         String[] imgString = new String[imgInt.length];
@@ -56,10 +59,13 @@ public class ListItemFragment extends Fragment {
         String[] name = {"Iphone 11", "Iphone 12 Pro", "Iphone 13 ProMax", "Iphone 12 Mini", "Iphone 13 Mini", "Iphone 11 ProMax", "Iphone 14", "Iphone 14 Pro", "Iphone 14 ProMax", "Iphone 15"};
         int[] price = {12000000, 16000000, 15000000, 17000000, 18000000, 19000000, 20000000, 22000000, 25000000, 26000000, 30000000};
 
-        for (int i = 1; i <= 5; i++){
-            itemList.add(new Item( imgString[random.nextInt(imgString.length)], i,  name[random.nextInt(name.length)], price[random.nextInt(price.length)], false));
+        for (int i = 1; i <= 100; i++){
+
+            Item item = (new Item( imgString[random.nextInt(imgString.length)], i,  name[random.nextInt(name.length)], price[random.nextInt(price.length)], false));
+            UserDatabase.getInstance(getContext()).userDAO().userInsert(item);
+
         }
-        return itemList;
+        return UserDatabase.getInstance(getContext()).userDAO().getListItem();
     }
     SharedPreferences.OnSharedPreferenceChangeListener listener;
 

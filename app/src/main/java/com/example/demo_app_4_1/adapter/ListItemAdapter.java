@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.demo_app_4_1.R;
+import com.example.demo_app_4_1.database.UserDatabase;
 import com.example.demo_app_4_1.model.Item;
 
 import java.util.ArrayList;
@@ -193,6 +194,46 @@ public class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapter.ItemVi
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                int idChanged = 0;
+                idChanged = sharedPreferences.getInt("id", 0);
+                if (key.equals("id")) {
+                    idChanged = sharedPreferences.getInt(key, 0);
+                    for (Item item : itemList) {
+                        if (item.getId() == idChanged) {
+                            item.setId(idChanged);
+                            break;
+                        }
+                    }
+                }
+
+                if (key.equals("name")) {
+                    String nameChanged = sharedPreferences.getString(key, "");
+                    for (Item item : itemList) {
+                        if (item.getId() == idChanged) {
+                            item.setName(nameChanged);
+                            break;
+                        }
+                    }
+                }
+                if (key.equals("image")) {
+                    String imageChanged = sharedPreferences.getString(key, "");
+                    for (Item item : itemList) {
+                        if (item.getId() == idChanged) {
+                            item.setResourceImage(imageChanged);
+                            break;
+                        }
+                    }
+                }
+                if (key.equals("price")) {
+                    int priceChanged = sharedPreferences.getInt(key, 0);
+                    for (Item item : itemList) {
+                        if (item.getId() == idChanged) {
+                            item.setPrice(priceChanged);
+                            break;
+                        }
+                    }
+                }
+
                 boolean checkFavor = sharedPreferences.getBoolean("favorite", false);
 
                 if (key.equals("favorite")){
@@ -234,7 +275,6 @@ public class ListItemAdapter extends RecyclerView.Adapter<ListItemAdapter.ItemVi
         };
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(listener);
-
         notifyDataSetChanged();
     }
 }

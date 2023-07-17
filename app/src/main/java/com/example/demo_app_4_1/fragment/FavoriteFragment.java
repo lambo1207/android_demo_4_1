@@ -38,7 +38,7 @@ public class FavoriteFragment extends Fragment {
         rcvItem.setLayoutManager(linearLayoutManager);
 
         listItemAdapter = new ListItemAdapter(getActivity());
-//        listItemAdapter.fillData(itemList);
+        listItemAdapter.fillData(itemList);
         rcvItem.setAdapter(listItemAdapter);
         listItemAdapter.notifyDataSetChanged();
 
@@ -50,7 +50,6 @@ public class FavoriteFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Toast.makeText(getContext(), "onResume", Toast.LENGTH_SHORT).show();
         listItemAdapter.fillData(itemList);
     }
 
